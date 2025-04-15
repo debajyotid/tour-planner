@@ -5,6 +5,7 @@ import requests
 
 from langchain.chains import ConversationChain
 from langchain_openai import ChatOpenAI
+from openai import OpenAI
 
 st.title("AI Trip Planner")
 OPENAI_API_KEY = st.text_input("Enter your OpenAI API Key:")
@@ -17,17 +18,19 @@ budget = st.number_input("Enter your budget (£):", min_value=0)
 interests = st.multiselect("Select your interests:",
                           ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"]
                            )
-llm = ChatOpenAI(temperature=0, api_key=OPENAI_API_KEY)
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
+                 temperature=0, 
+                 api_key=OPENAI_API_KEY)
 conversation = ConversationChain(llm=llm)
 
 def generate_itinerary(destination, start_date, end_date, interests):
-    open.ai_key=OPENAI_API_KEY
+    client = OpenAI(api_key=OPENAI_API_KEY)
     prompt = f"""
     I am planning a trip to {destination} from {start_date} to {end_date}.
     My interests are {', '.join(interests)}.
     Please create a day-by-day itinerary including activities, restaurants, and must-see attractions.
     """
-    response = openai.Completion.create(engine="text-davinci-003",prompt=prompt,max_tokens=500)
+    response = client.completions.create(engine="gpt-3.5-turbo-0125",prompt=prompt,max_tokens=500,temperature=0)
     return response['choices'][0]['text']
 
 if destination:
