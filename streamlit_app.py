@@ -20,7 +20,7 @@ interests = st.multiselect("Select your interests:",
                            )
 llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
                  temperature=0, 
-                 api_key=OPENAI_API_KEY)
+                 api_key=OPENAI_API_KEY,)
 conversation = ConversationChain(llm=llm)
 
 def generate_itinerary(destination, start_date, end_date, interests):
