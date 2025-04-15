@@ -20,11 +20,13 @@ llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
                  api_key=st.secrets["OPENAI_API_KEY"])
 conversation = ConversationChain(llm=llm)
 
-def generate_itinerary(destination, start_date, end_date, interests):
+def generate_itinerary(destination, start_date, end_date, budget, interests):
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     prompt = f"""
     You are a helpful tour planner.
-    Please create a day-by-day itinerary for a trip to {destination} from {start_date} to {end_date},
+    Please create a day-by-day itinerary for a trip to {destination} 
+    from {start_date} to {end_date}
+    within a budget of £{budget} and 
     with focus on the below interests {', '.join(interests)}.
     """
     response = client.chat.completions.create(model="gpt-3.5-turbo-0125",
@@ -65,7 +67,7 @@ if st.button("Generate Plan"):
     # Call the AI model and APIs here
     st.write("Generating your trip plan...")
     generate_itinerary(destination, start_date, end_date, interests)
-    get_attractions(destination)
+    #get_attractions(destination)
     get_weather(destination)
 
 user_message = st.text_input("Refine your plan by asking questions:")
