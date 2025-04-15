@@ -30,7 +30,7 @@ def generate_itinerary(destination, start_date, end_date, interests):
     My interests are {', '.join(interests)}.
     Please create a day-by-day itinerary including activities, restaurants, and must-see attractions.
     """
-    response = client.completions.create(engine="gpt-3.5-turbo-0125",prompt=prompt,max_tokens=500,temperature=0)
+    response = client.completions.create(model="gpt-3.5-turbo-0125",prompt=prompt,max_tokens=500,temperature=0)
     return response['choices'][0]['text']
 
 if destination:
