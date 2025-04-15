@@ -65,7 +65,14 @@ def get_attractions(destination):
         - The type of places searched is restricted to 'tourist_attraction'.
     """
     gmaps = googlemaps.Client(key=st.secrets["googlemaps_api_key"])
-    places_result = gmaps.places_nearby(location=destination,radius=5000,type='tourist_attraction')
+
+    geocode_result = gmaps.geocode(destination)
+    if not geocode_result:
+        raise ValueError(f"Could not geocode destination: {destination}")
+    location = geocode_result[0]['geometry']['location']
+    lat_lng = (location['lat'], location['lng'])
+
+    places_result = gmaps.places_nearby(location=lat_lng,radius=5000,type='tourist_attraction')
     return [place['name'] for place in places_result['results']]
 
 def get_weather(destination):
