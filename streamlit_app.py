@@ -33,10 +33,9 @@ def generate_itinerary(destination, start_date, end_date, interests):
                                                                 "role": "developer",
                                                                 "content": prompt
                                                             }
-                                                        ]
+                                                        ],
                                               max_tokens=500,
-                                              temperature=0
-                                              )
+                                              temperature=0)
     return response.choices[0].message.content
 
 if destination:
