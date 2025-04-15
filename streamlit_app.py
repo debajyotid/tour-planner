@@ -60,11 +60,6 @@ if st.button("Generate Plan"):
     get_attractions(destination)
     get_weather(destination)
 
-st.header("Your Final Itinerary")
-st.write(itinerary)
-st.write("Top Attractions:", ", ".join(attractions))
-st.write(f"Weather Forecast: {weather}")
-
 user_message = st.text_input("Refine your plan by asking questions:")
 if user_message:
     reply = conversation.run(input=user_message)
