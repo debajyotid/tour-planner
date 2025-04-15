@@ -8,9 +8,6 @@ from langchain_openai import ChatOpenAI
 from openai import OpenAI
 
 st.title("AI Trip Planner")
-OPENAI_API_KEY = st.text_input("Enter your OpenAI API Key:")
-googlemaps_api_key=st.text_input("Enter your GoogleMaps API Key:")
-openweather_api_key=st.text_input("Enter your OpenWeather API Key:")
 destination = st.text_input("Enter your destination:")
 start_date = st.date_input("Start Date")
 end_date = st.date_input("End Date")
@@ -20,11 +17,11 @@ interests = st.multiselect("Select your interests:",
                            )
 llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
                  temperature=0, 
-                 api_key=OPENAI_API_KEY,)
+                 api_key=st.secrets["OPENAI_API_KEY"])
 conversation = ConversationChain(llm=llm)
 
 def generate_itinerary(destination, start_date, end_date, interests):
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     prompt = f"""
     I am planning a trip to {destination} from {start_date} to {end_date}.
     My interests are {', '.join(interests)}.
@@ -38,7 +35,7 @@ if destination:
     st.text_area("Your AI-generated itinerary:", itinerary)
 
 def get_attractions(destination):
-    gmaps = googlemaps.Client(key=googlemaps_api_key)
+    gmaps = googlemaps.Client(key=st.secrets["googlemaps_api_key"])
     places_result = gmaps.places_nearby(location=destination,radius=5000,type='tourist_attraction')
     return [place['name'] for place in places_result['results']]
 
@@ -47,7 +44,7 @@ if destination:
     st.write("Top Attractions:", attractions)
 
 def get_weather(destination):
-    api_key = openweather_api_key
+    api_key = st.secrets["openweather_api_key"]
     url = f"http://api.openweathermap.org/data/2.5/weather?q={destination}&appid={api_key}"
     response = requests.get(url).json()
     return response['weather'][0]['description']
