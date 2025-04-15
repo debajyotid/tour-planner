@@ -19,15 +19,36 @@ llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
 conversation = ConversationChain(llm=llm)
 
 def generate_itinerary(destination, start_date, end_date, budget, interests):
+    """Generates a personalized travel itinerary using OpenAI.
 
+    Fetches local attractions and weather forecasts to create a detailed,
+    day-by-day plan based on user preferences and constraints.
+
+    Args:
+        destination (str): The city or region for the trip.
+        start_date (str): The starting date of the trip (e.g., "YYYY-MM-DD").
+        end_date (str): The ending date of the trip (e.g., "YYYY-MM-DD").
+        budget (float | int): The total budget for the trip in GBP (£).
+        interests (list[str]): A list of the traveler's interests (e.g., ["history", "food"]).
+
+    Returns:
+        str: A string containing the generated day-by-day itinerary from the OpenAI model.
+
+    Raises:
+        KeyError: If the OpenAI API key ("OPENAI_API_KEY") is not found in Streamlit secrets.
+        openai.APIError: If there is an issue communicating with the OpenAI API.
+        # Note: This function also depends on the successful execution of
+        # get_attractions() and get_weather(), which might raise their own specific errors
+        # (e.g., related to Google Maps API, OpenWeatherMap API, network issues, or missing keys).
+
+    Note:
+        Requires the 'openai' library and Streamlit ('st') for secret management.
+        Assumes `get_attractions` and `get_weather` functions are defined and
+        accessible in the same scope and handle their own API interactions.
+    """ 
     tourist_attraction = get_attractions(destination)
     weather_forecast = get_weather(destination)
 
-    """Generates a day-by-day itinerary using OpenAI's ChatCompletion API.
-
-    Constructs a prompt based on user inputs and queries OpenAI's model to
-    generate a travel itinerary.
-    """
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     prompt = f"""
     You are a helpful tour planner.
@@ -50,20 +71,28 @@ def generate_itinerary(destination, start_date, end_date, budget, interests):
     return response.choices[0].message.content
     
 def get_attractions(destination):
-    """
-    Fetches a list of tourist attractions near a given destination using the Google Maps API.
+    """Fetches a list of tourist attractions near a given destination using the Google Maps API.
 
     Args:
-        destination (str): The location (latitude and longitude as a string) around which to search for tourist attractions.
+        destination (str): The name of the destination (e.g., "Paris, France").
 
     Returns:
-        list: A list of names of tourist attractions near the specified destination.
+        list[str]: A list of names of tourist attractions near the destination.
+                   Returns an empty list if no attractions are found.
+
+    Raises:
+        ValueError: If the destination cannot be geocoded.
+        googlemaps.exceptions.ApiError: If there is an issue with the Google Maps API request.
+        KeyError: If the API key is not found in Streamlit secrets.
 
     Note:
-        - The function uses the Google Maps API and requires a valid API key stored in `st.secrets["googlemaps_api_key"]`.
-        - The search radius is set to 5000 meters.
-        - The type of places searched is restricted to 'tourist_attraction'.
+        This function requires the 'googlemaps' and 'streamlit' libraries to be installed
+        and a valid Google Maps API key stored in Streamlit secrets under the key
+        "googlemaps_api_key". It searches for attractions within a 5km radius
+        of the geocoded destination. Requires 'googlemaps' and 'streamlit'
+        libraries to be imported.
     """
+
     gmaps = googlemaps.Client(key=st.secrets["googlemaps_api_key"])
 
     geocode_result = gmaps.geocode(destination)
