@@ -13,8 +13,7 @@ start_date = st.date_input("Start Date")
 end_date = st.date_input("End Date")
 budget = st.number_input("Enter your budget (£):", min_value=0)
 interests = st.multiselect("Select your interests:",
-                          ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"]
-                           )
+                          ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
 llm = ChatOpenAI(model="gpt-3.5-turbo-0125",
                  temperature=0, 
                  api_key=st.secrets["OPENAI_API_KEY"])
@@ -39,36 +38,29 @@ def generate_itinerary(destination, start_date, end_date, budget, interests):
                                               max_tokens=500,
                                               temperature=0)
     return response.choices[0].message.content
-
-if destination:
-    itinerary = generate_itinerary(destination, start_date, end_date, interests)
-    st.text_area("Your AI-generated itinerary:", itinerary)
-
+    
 def get_attractions(destination):
     gmaps = googlemaps.Client(key=st.secrets["googlemaps_api_key"])
     places_result = gmaps.places_nearby(location=destination,radius=5000,type='tourist_attraction')
     return [place['name'] for place in places_result['results']]
-
-if destination:
-    attractions = get_attractions(destination)
-    st.write("Top Attractions:", attractions)
 
 def get_weather(destination):
     api_key = st.secrets["openweather_api_key"]
     url = f"http://api.openweathermap.org/data/2.5/weather?q={destination}&appid={api_key}"
     response = requests.get(url).json()
     return response['weather'][0]['description']
-
-if destination:
-    weather = get_weather(destination)
-    st.write(f"Weather in {destination}: {weather}")
-
+    
 if st.button("Generate Plan"):
     # Call the AI model and APIs here
     st.write("Generating your trip plan...")
-    generate_itinerary(destination, start_date, end_date, interests)
-    #get_attractions(destination)
-    get_weather(destination)
+    itinerary = generate_itinerary(destination, start_date, end_date, budget, interests)
+    st.text_area("Your AI-generated itinerary:", itinerary)
+
+    #attractions = get_attractions(destination)
+    #st.write("Top Attractions:", attractions)
+
+    weather = get_weather(destination)
+    st.write(f"Weather in {destination} is expected to be: {weather}")
 
 user_message = st.text_input("Refine your plan by asking questions:")
 if user_message:
