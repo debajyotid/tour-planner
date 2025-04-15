@@ -23,12 +23,21 @@ conversation = ConversationChain(llm=llm)
 def generate_itinerary(destination, start_date, end_date, interests):
     client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
     prompt = f"""
-    I am planning a trip to {destination} from {start_date} to {end_date}.
-    My interests are {', '.join(interests)}.
-    Please create a day-by-day itinerary including activities, restaurants, and must-see attractions.
+    You are a helpful tour planner.
+    Please create a day-by-day itinerary for a trip to {destination} from {start_date} to {end_date},
+    with focus on the below interests {', '.join(interests)}.
     """
-    response = client.completions.create(model="gpt-3.5-turbo-0125",prompt=prompt,max_tokens=500,temperature=0)
-    return response['choices'][0]['text']
+    response = client.chat.completions.create(model="gpt-3.5-turbo-0125",
+                                              messages=[
+                                                            {
+                                                                "role": "developer",
+                                                                "content": prompt
+                                                            }
+                                                        ]
+                                              max_tokens=500,
+                                              temperature=0
+                                              )
+    return response.choices[0].message.content
 
 if destination:
     itinerary = generate_itinerary(destination, start_date, end_date, interests)
