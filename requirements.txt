@@ -1,6 +1,7 @@
 streamlit
 openai 
 langchain-openai
+langchain_community
 langchain
 requests 
 googlemaps
