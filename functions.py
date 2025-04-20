@@ -2,7 +2,26 @@
 import googlemaps
 import requests
 
-def get_attractions(destination, googlemapsapi):
+# Check if the destination is a valid city
+# Validate the destination using a placeholder function
+def is_valid_city(city, gmapsclient):
+    """
+    Validates if a given city is valid by attempting to geocode it using the Google Maps API.
+
+    Args:
+        city (str): The name of the city to validate.
+        gmapsclient (googlemaps.Client): An instance of the Google Maps API client.
+
+    Returns:
+        bool: True if the city is valid (can be geocoded), False otherwise.
+    """
+    try:
+        # Attempt to geocode the city
+        return gmapsclient.geocode(city)
+    except googlemaps.exceptions.ApiError:
+        return False
+
+def get_attractions(destination, gmapsclient):
     """Fetches a list of tourist attractions near a given destination using the Google Maps API.
 
     Args:
@@ -28,8 +47,7 @@ def get_attractions(destination, googlemapsapi):
     lat_lng = (destination['lat'], destination['lng'])
 
     # Using the "places_nearby" API to get tourist attractions, within a 5000m radius, of the latitude-longitude of the chosen destination
-    places_result = googlemapsapi.places_nearby(
-        location=lat_lng, radius=5000, type='tourist_attraction')
+    places_result = gmapsclient.places_nearby(location=lat_lng, radius=5000, type='tourist_attraction')
     return [place['name'] for place in places_result['results']]
 
 def get_weather(destination,api_key):
@@ -55,7 +73,7 @@ def get_weather(destination,api_key):
     else:
         return "Weather data not available."
 
-def generate_itinerary(destination, start_date, end_date, budget, interests, openaiclient, gmapsclient, openweather_api_key):
+def generate_itinerary(destination, start_date, end_date, budget, interests, location, openaiclient, gmapsclient, openweather_api_key):
     """Generates a day-by-day travel itinerary for a specified destination, date range, budget, and interests.
 
     Args:
@@ -77,11 +95,7 @@ def generate_itinerary(destination, start_date, end_date, budget, interests, ope
         - Retrieves tourist attractions and weather forecast using external APIs.
         - Leverages OpenAI's GPT model to generate the itinerary based on the provided inputs."""
 
-    # Generating the latitude and longitudes for the chosen destination using GoogleMaps APIs
-    geocode_result = gmapsclient.geocode(destination)
-    if not geocode_result:
-        raise ValueError(f"Could not geocode destination: {destination}")
-    location = geocode_result[0]['geometry']['location']
+
 
     # Fetching the tourist attractions for the destination
     tourist_attraction = get_attractions(location, gmapsclient)

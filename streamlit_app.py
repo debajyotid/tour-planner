@@ -3,19 +3,8 @@ import streamlit as st
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain.prompts import ChatPromptTemplate
 from langchain.chains import LLMChain
-from openai import OpenAI
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
-
-# Using LanChain's ChatMessageHistory to save Chat session history
-history = ChatMessageHistory()
-
-# Using OpenAI "gpt-3.5-turbo-0125" model to generate the itinenary
-llm = ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0,api_key=OPENAI_API_KEY)
-from langchain.chains import LLMChain
-
 from functions import *
 
 OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
@@ -27,6 +16,9 @@ history = ChatMessageHistory()
 
 # Using OpenAI "gpt-3.5-turbo-0125" model to generate the itinenary
 llm = ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0,api_key=OPENAI_API_KEY)
+
+# Using LanChain's ChatMessageHistory to save Chat session history
+history = ChatMessageHistory()
 
 # Generating a new prompt template to handle conversation history
 conversation_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful travel planning assistant. Refine the itinerary as per the user's requests."),
@@ -64,11 +56,52 @@ def main():
     if st.button("Generate Plan"):
         # Call the AI model and APIs here
         st.write("Generating your trip plan...")
+
+        # Check if OPENAI API key is set and create a client
+        if not OPENAI_API_KEY:
+            raise ValueError("OpenAI API key is missing.")
         client = OpenAI(api_key=OPENAI_API_KEY)
+
+        # Check if the Google Maps API key is set and create a Google Maps client
         if not googlemaps_api_key:
             raise ValueError("Google Maps API key is missing.")
         gmaps = googlemaps.Client(key=googlemaps_api_key)
-        itinerary = generate_itinerary(destination, start_date, end_date, budget, interests, client, gmaps, openweather_api_key)
+        
+        # Validate the date range
+        if start_date > end_date:
+            st.error("Start date must be before end date.")
+            return
+        
+        # Validate the budget
+        if budget <= 0:
+            st.error("Budget must be greater than zero.")
+            return
+        
+        # Validate the interests
+        if not interests:
+            st.error("Please select at least one interest.")
+            return
+        
+        # Validate the destination
+        if not destination:
+            st.error("Please enter a destination.")
+            return
+        
+        # Validate the start and end dates
+        if not start_date or not end_date:
+            st.error("Please select start and end dates.")
+            return
+
+        # Validate the destination using Google Maps API
+        if not (geocode_result := is_valid_city(destination, gmaps)):
+            st.error("Invalid destination. Please enter a valid city.")
+            return
+        # Generating the latitude and longitudes for the chosen destination using GoogleMaps APIs
+        location = geocode_result[0]['geometry']['location']
+
+        # Generate the itinerary using the provided inputs and API clients
+        itinerary = generate_itinerary(destination, start_date, end_date, budget, interests, location, client, gmaps, openweather_api_key)
+
         # Passing the generated itinenary to the Chat history
         history.add_ai_message(itinerary)
         #st.text_area("Your AI-generated itinerary:", itinerary)
