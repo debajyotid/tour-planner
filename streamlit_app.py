@@ -1,9 +1,19 @@
 import streamlit as st
 
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
 from openai import OpenAI
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
+from openai import OpenAI
+
+# Using LanChain's ChatMessageHistory to save Chat session history
+history = ChatMessageHistory()
+
+# Using OpenAI "gpt-3.5-turbo-0125" model to generate the itinenary
+llm = ChatOpenAI(model="gpt-3.5-turbo-0125",temperature=0,api_key=OPENAI_API_KEY)
 from langchain.chains import LLMChain
 
 from functions import *
