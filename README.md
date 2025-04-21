@@ -92,6 +92,11 @@ Error Handling:
 - Input validation ensures that invalid or incomplete inputs are flagged before processing.
 - External API errors are caught and displayed to the user.
 
+#### Note: You will need to create a secrets.toml file, under a folder .streamlit in your local repository, with the below API Keys
+- OPENAI_API_KEY      = API Key for using OpenAI APIs for using the "gpt-3.5-turbo-0125" model
+- googlemaps_api_key  = API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
+- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination 
+
 ----------------------
 
 
@@ -112,5 +117,10 @@ Libraries
 - `itinerary_generated`: Boolean flag indicating whether an itinerary has been generated.
 - `current_itinerary`: Stores the latest generated or refined itinerary.
 - `refine_input`: Stores the user's refinement request.
+
+#### Note: You can execute the notebook as a Kaggle Notebook, in which case the API keys will not be needed, otherwise you will need the below API Keys
+- OPENAI_API_KEY      = API Key for using OpenAI APIs for using the "gpt-3.5-turbo-0125" model
+- googlemaps_api_key  = API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
+- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination 
 
 
