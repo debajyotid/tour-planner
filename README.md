@@ -1,4 +1,4 @@
-AI Trip Planner Streamlit Application
+Building a Smart, AI-powered Trip Planner using OpenAI-Google Maps-OpenWeather APIs and Langchain for Conversational Support
 ----------------------
 This Streamlit application serves as an AI-powered trip planner that allows users to input 
 their travel preferences and generates a customized itinerary. Users can refine the itinerary 
