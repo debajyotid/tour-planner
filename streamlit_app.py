@@ -62,42 +62,51 @@ from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from functions import *
 
-# --- Configuration ---
+# --- Global Configuration & Initialization ---
 try:
-    OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-    googlemaps_api_key = st.secrets["googlemaps_api_key"]
-    openweather_api_key = st.secrets["openweather_api_key"]
+    # --- Configuration ---
+    try:
+        OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+        googlemaps_api_key = st.secrets["googlemaps_api_key"]
+        openweather_api_key = st.secrets["openweather_api_key"]
+    except KeyError as e:
+        st.error(f"Missing secret: {e}. Please configure secrets.")
+        st.stop() # Stop execution if secrets are missing
+
+    # --- Initialize Session State ---
+    # Use session state to store history and generation status (runs only once per session)
+    if 'history' not in st.session_state:
+        st.session_state.history = ChatMessageHistory()
+    if 'itinerary_generated' not in st.session_state:
+        st.session_state.itinerary_generated = False
+    if 'current_itinerary' not in st.session_state:
+        st.session_state.current_itinerary = "" # Store the latest itinerary text
+
+    # --- LLM and Prompt Setup ---
+    # Using OpenAI "gpt-3.5-turbo-0125" model
+    try:
+        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0, api_key=OPENAI_API_KEY)
+        client = OpenAI(api_key=OPENAI_API_KEY) # OpenAI client for other potential uses
+        gmaps = googlemaps.Client(key=googlemaps_api_key) # Google Maps client
+    except Exception as e:
+        st.error(f"Error initializing API clients: {e}")
+        st.stop() # Stop execution if clients fail to initialize
+
+    # Generating a new prompt template to handle conversation history
+    conversation_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful travel planning assistant. Refine the itinerary based on the user's requests and the previous conversation history."),
+                                                            ("placeholder", "{history}"), # Use placeholder for Langchain >= 0.1.0
+                                                            ("human", "{input}"),
+                                                            ])
+    
+    # Create the chain (do this once)
+    refine_chain = LLMChain(llm=llm, prompt=conversation_prompt)
+
 except KeyError as e:
-    st.error(f"Missing secret: {e}. Please configure secrets.")
-    st.stop() # Stop execution if secrets are missing
-
-# --- Initialize Session State ---
-# Use session state to store history and generation status
-if 'history' not in st.session_state:
-    st.session_state.history = ChatMessageHistory()
-if 'itinerary_generated' not in st.session_state:
-    st.session_state.itinerary_generated = False
-if 'current_itinerary' not in st.session_state:
-    st.session_state.current_itinerary = "" # Store the latest itinerary text
-
-# --- LLM and Prompt Setup ---
-# Using OpenAI "gpt-3.5-turbo-0125" model
-try:
-    llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0, api_key=OPENAI_API_KEY)
-    client = OpenAI(api_key=OPENAI_API_KEY) # OpenAI client for other potential uses
-    gmaps = googlemaps.Client(key=googlemaps_api_key) # Google Maps client
+    st.error(f"CRITICAL ERROR: Missing secret: {e}. Please configure secrets in Streamlit.")
+    st.stop() # Stop execution if secrets are missing during initial load
 except Exception as e:
-    st.error(f"Error initializing API clients: {e}")
-    st.stop()
-
-
-# Generating a new prompt template to handle conversation history
-conversation_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful travel planning assistant. Refine the itinerary based on the user's requests and the previous conversation history."),
-                                                        ("placeholder", "{history}"), # Use placeholder for Langchain >= 0.1.0
-                                                        ("human", "{input}"),
-                                                        ])
-# Create the chain (do this once)
-refine_chain = LLMChain(llm=llm, prompt=conversation_prompt)
+    st.error(f"CRITICAL ERROR during initialization: {e}")
+    st.stop() # Stop execution on other critical init errors   
 
 #-----------------------------------------generate_refined_plan()--------------------------------------------------------------------------------------------------------------
 # Function to generate a refined trip plan based on user input
@@ -179,10 +188,8 @@ def render_input_form():
         start_date = st.date_input("Start Date")
         end_date = st.date_input("End Date")
         budget = st.number_input("Enter your budget (£):", min_value=1) # Min value 1
-        interests = st.multiselect(
-            "Select your interests:",
-            ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"]
-        )
+        interests = st.multiselect("Select your interests:",
+                                   ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
         submitted = st.form_submit_button("Generate Plan")
     return submitted, destination, start_date, end_date, budget, interests
 
@@ -392,6 +399,7 @@ def main():
     # Example: gmaps_client = gmaps, openai_client = client, etc.
 
     # --- Input Form ---
+    # Uses globally initialized gmaps, client, openweather_api_key   
     submitted, destination, start_date, end_date, budget, interests = render_input_form()
 
     # --- Handle Form Submission ---
@@ -408,15 +416,16 @@ def main():
             st.session_state.current_itinerary = ""
         else:
             # --- Generate Initial Itinerary ---
+            # Pass the globally initialized clients and keys
             handle_initial_generation(destination,
                                       start_date,
                                       end_date,
                                       budget,
                                       interests,
                                       geocode_result,
-                                      client, # Pass the initialized OpenAI client
-                                      gmaps,  # Pass the initialized Google Maps client
-                                      openweather_api_key) # Pass the weather API key
+                                      client, # Global OpenAI client
+                                      gmaps,  # Global Google Maps client
+                                      openweather_api_key) # Global OpenWeather API key
 
     # --- Display Itinerary and Refinement Section ---
     # This part runs on every interaction if an itinerary exists
@@ -424,36 +433,6 @@ def main():
 
 # --- Run the App ---
 if __name__ == "__main__":
-    # Ensure necessary clients/keys are initialized before main() if needed globally
-    # Example initialization (should match your actual setup)
-    try:
-        OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
-        googlemaps_api_key = st.secrets["googlemaps_api_key"]
-        openweather_api_key = st.secrets["openweather_api_key"]
-        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0, api_key=OPENAI_API_KEY)
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        gmaps = googlemaps.Client(key=googlemaps_api_key)
-        # Initialize history and other session state defaults if not done elsewhere
-        if 'history' not in st.session_state:
-            st.session_state.history = ChatMessageHistory()
-        if 'itinerary_generated' not in st.session_state:
-            st.session_state.itinerary_generated = False
-        if 'current_itinerary' not in st.session_state:
-            st.session_state.current_itinerary = "" # Store the latest itinerary text
-
-        # Setup refine_chain (assuming it depends on llm and prompt defined globally/outside main)
-        conversation_prompt = ChatPromptTemplate.from_messages([("system", "You are a helpful travel planning assistant.You are given a list of places to visit and a budget. Refine the itinerary based on the user's requests and the previous conversation history."),
-                                                                ("placeholder", "{history}"),
-                                                                ("human", "{input}"),
-        ])
-        refine_chain = LLMChain(llm=llm, prompt=conversation_prompt)
-
-        # Call main
-        main()
-
-    except KeyError as e:
-        st.error(f"Missing secret: {e}. Please configure secrets.")
-        st.stop() # Stop execution if secrets are missing
-    except Exception as e:
-        st.error(f"Error during initialization or execution: {e}")
-        st.stop()
+    #Call main function to run the Streamlit app
+    main()
+# --- End of Streamlit App ---
