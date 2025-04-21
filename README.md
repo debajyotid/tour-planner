@@ -1,10 +1,54 @@
 Building a Smart, AI-powered Trip Planner using OpenAI-Google Maps-OpenWeather APIs and Langchain for Conversational Support
 ----------------------
-This Streamlit application serves as an AI-powered trip planner that allows users to input 
-their travel preferences and generates a customized itinerary. Users can refine the itinerary 
-based on their feedback, leveraging OpenAI's GPT model and external APIs like Google Maps 
-and OpenWeather.
+This AI-powered trip planner allows users to input their travel preferences and generates a customized itinerary. Users can refine the itinerary 
+based on their feedback, leveraging OpenAI's GPT model and external APIs like Google Maps and OpenWeather.
 
+Technical Implementation
+----------------------
+The system is built using:
+
+1. OpenAI's gpt-3.5-turbo-0125 model for natural language processing
+2. LangChain for managing conversation history and context
+3. Google Maps API for location and attraction data
+4. OpenWeather API for weather forecasts
+5. Python libraries: streamlit, pandas, ipywidgets (for the notebook edition)
+
+How It Works
+----------------------
+- Users input their travel preferences including destination, dates, and interests.
+- The system fetches real-time data about local attractions and weather.
+- An AI-generated itinerary is created based on all inputs.
+- Users can refine the itinerary through natural conversation with the AI
+
+Practical Applications
+----------------------
+This tool demonstrates the power of combining:
+
+- Large Language Models (LLMs),
+- Real-time data integration,
+- Conversational AI,
+- API orchestration
+
+It is perfect for travel agencies, individual travelers, or anyone looking to plan a detailed, personalized trip.
+
+----------------------
+
+## This repository presents 2 ways of executing the travel planner.
+
+### The 1st is through a streamlit app, and to run it on your own machine
+
+1. Install the requirements
+
+   ```
+   $ pip install -r requirements.txt
+   ```
+
+2. Run the app
+
+   ```
+   $ streamlit run streamlit_app.py
+   
+   ```
 Modules and Functions:
 ----------------------
 1. **generate_refined_plan(user_input)**:
@@ -28,53 +72,7 @@ Modules and Functions:
     - Entry point for the Streamlit application.
     - Configures the page layout, handles user input, validates inputs, generates the initial 
       itinerary, and provides options for refinement.
-
-Technical Implementation
-----------------------
-The system is built using:
-
-OpenAI's gpt-3.5-turbo-0125 model for natural language processing
-LangChain for managing conversation history and context
-Google Maps API for location and attraction data
-OpenWeather API for weather forecasts
-Python libraries: streamlit, pandas
-
-How It Works
-----------------------
-Users input their travel preferences including destination, dates, and interests
-The system fetches real-time data about local attractions and weather
-An AI-generated itinerary is created based on all inputs
-Users can refine the itinerary through natural conversation with the AI
-
-Practical Applications
-----------------------
-This tool demonstrates the power of combining:
-
-Large Language Models (LLMs)
-Real-time data integration
-Conversational AI
-API orchestration
-
-It is perfect for travel agencies, individual travelers, or anyone looking to plan a detailed, personalized trip.
-
-----------------------
-
-## This repository presents 2 ways of executing the travel planner.
-
-### The 1st is through a streamlit app, and to run it on your own machine
-
-1. Install the requirements
-
-   ```
-   $ pip install -r requirements.txt
-   ```
-
-2. Run the app
-
-   ```
-   $ streamlit run streamlit_app.py
-   
-   ```
+         
 Libraries
 -------------
 - Streamlit: For UI rendering and interaction.
