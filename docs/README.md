@@ -128,7 +128,7 @@ Libraries
 
 ### Lastly, the 3rd way is through Docker
 
-1.	Build the Docker image and start services: docker-compose -f docker/docker-compose.yml up --build
+1.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
 2.	Access the app at `http://localhost:8501`
 
 Required Environment Variables
