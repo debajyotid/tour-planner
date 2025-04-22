@@ -49,7 +49,6 @@ It is perfect for travel agencies, individual travelers, or anyone looking to pl
    $ streamlit run streamlit_app.py
    
    ```
-#### You can also access the app via: https://debajyotidas88-aitourplanner.streamlit.app
    
 Modules and Functions:
 ----------------------
@@ -97,7 +96,9 @@ Error Handling:
 #### Note: You will need to create a secrets.toml file, under a folder .streamlit in your local repository, with the below API Keys
 - OPENAI_API_KEY      = API Key for using OpenAI APIs for using the "gpt-3.5-turbo-0125" model
 - googlemaps_api_key  = API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
-- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination 
+- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination
+
+#### Note: You can also access the above as a ready-to-use webapp via: https://debajyotidas88-aitourplanner.streamlit.app
 
 ----------------------
 
@@ -127,14 +128,8 @@ Libraries
 
 ### Lastly, the 3rd way is through Docker
 
-1.	Build the Docker image: docker build -t ai-trip-planner .
-2.	Run the container:
-- docker run -p 8501:8501 \
-  -e OPENAI_API_KEY=your_openai_key \
-  -e googlemaps_api_key=your_gmaps_key \
-  -e openweather_api_key=your_weather_key \
-  ai-trip-planner
-3. Access the app at `http://localhost:8501`
+1.	Build the Docker image and start services: docker-compose -f docker/docker-compose.yml up --build
+2.	Access the app at `http://localhost:8501`
 
 Required Environment Variables
 -------------------
