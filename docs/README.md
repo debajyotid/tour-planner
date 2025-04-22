@@ -126,9 +126,11 @@ Libraries
 - googlemaps_api_key  = API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
 - openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination
 
+----------------------
+
 ### Lastly, the 3rd way is through Docker
 
-1.	Build the Docker image and start services: docker-compose -f docker/docker-compose.yml up --build
+1.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
 2.	Access the app at `http://localhost:8501`
 
 Required Environment Variables
