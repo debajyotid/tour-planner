@@ -49,6 +49,8 @@ It is perfect for travel agencies, individual travelers, or anyone looking to pl
    $ streamlit run streamlit_app.py
    
    ```
+### You can also access the app via the url: https://blank-app-2xug66lo1a8.streamlit.app
+   
 Modules and Functions:
 ----------------------
 1. **generate_refined_plan(user_input)**:
