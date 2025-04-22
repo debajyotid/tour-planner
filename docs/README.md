@@ -132,10 +132,11 @@ Libraries
 
 1.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
 2.	Access the app at `http://localhost:8501`
+3.	To stop the containers: Press `Ctrl+C` in the terminal, then run: `docker-compose -f docker/docker-compose.yml down`
 
 Required Environment Variables
 -------------------
-Replace these in your Docker run command:
+Replace these in your `.env` file:
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `googlemaps_api_key`: Google Maps API key
 - `openweather_api_key`: OpenWeatherMap API key
