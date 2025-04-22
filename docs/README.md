@@ -134,9 +134,9 @@ Libraries
 Required Environment Variables
 -------------------
 Replace these in your Docker run command:
-	•	`OPENAI_API_KEY`: Your OpenAI API key
-	•	`googlemaps_api_key`: Google Maps API key
-	•	`openweather_api_key`: OpenWeatherMap API key
+- `OPENAI_API_KEY`: Your OpenAI API key
+- `googlemaps_api_key`: Google Maps API key
+- `openweather_api_key`: OpenWeatherMap API key
 
 
 
