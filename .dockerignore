@@ -1,1 +1,8 @@
-
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+.env
+secrets.toml
