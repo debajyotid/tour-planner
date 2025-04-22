@@ -2,7 +2,6 @@
 FROM python:3.9-slim as base
 
 # Common environment variables
-ENV PYTHONUNBUFFERED=1 \
     OPENAI_API_KEY=${OPENAI_API_KEY} \
     googlemaps_api_key=${GOOGLEMAPS_KEY} \
     openweather_api_key=${OPENWEATHER_KEY}
