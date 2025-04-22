@@ -170,3 +170,4 @@ cython_debug/
 .env
 docker-compose*.yml
 *.env
+*.env
