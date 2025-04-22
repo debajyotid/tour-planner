@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - googlemaps_api_key=${GOOGLEMAPS_KEY}
+      - openweather_api_key=${OPENWEATHER_KEY}
+volumes:
+  app-data:
