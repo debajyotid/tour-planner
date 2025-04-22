@@ -33,7 +33,7 @@ It is perfect for travel agencies, individual travelers, or anyone looking to pl
 
 ----------------------
 
-## This repository presents 2 ways of executing the travel planner.
+## This repository presents 3 ways of executing the travel planner.
 
 ### The 1st is through a streamlit app, and to run it on your own machine
 
@@ -102,7 +102,7 @@ Error Handling:
 ----------------------
 
 
-### The 2nd is through a jupyter notebook (currently configured as a Kaggle Notebook, but can be run locally as well
+### The 2nd is through a jupyter notebook (currently configured as a Kaggle Notebook), but can be run locally as well
 
 To run the file on your local system, comment the 'kaggle_secrets' codecell and provide your own 
 OpenAI, Google Maps, and OpenWeather API Keys for OPENAIKEY, googlemaps_api_key, and openweather_api_key respectively
@@ -123,6 +123,25 @@ Libraries
 #### Note: You can execute the notebook as a Kaggle Notebook, in which case the API keys will not be needed, otherwise you will need the below API Keys
 - OPENAI_API_KEY      = API Key for using OpenAI APIs for using the "gpt-3.5-turbo-0125" model
 - googlemaps_api_key  = API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
-- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination 
+- openweather_api_key = API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination
+
+### Lastly, the 3rd way is through Docker
+
+1.	Build the Docker image: docker build -t ai-trip-planner .
+2.	Run the container:
+- docker run -p 8501:8501 \
+  -e OPENAI_API_KEY=your_openai_key \
+  -e googlemaps_api_key=your_gmaps_key \
+  -e openweather_api_key=your_weather_key \
+  ai-trip-planner
+3. Access the app at `http://localhost:8501`
+
+Required Environment Variables
+-------------------
+Replace these in your Docker run command:
+	•	`OPENAI_API_KEY`: Your OpenAI API key
+	•	`googlemaps_api_key`: Google Maps API key
+	•	`openweather_api_key`: OpenWeatherMap API key
+
 
 
