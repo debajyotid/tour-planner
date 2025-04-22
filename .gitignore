@@ -1,7 +1,3 @@
-# Streamlit secrets and config
-streamlit_app/config/.streamlit/secrets.toml
-streamlit_app/config/.streamlit/secrets.toml.*
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -167,3 +163,7 @@ cython_debug/
 
 # Secrets
 .streamlit/secrets.toml 
+
+# Streamlit secrets and config
+/streamlit_app/config/.streamlit/secrets.toml
+/streamlit_app/config/.streamlit/secrets.toml.*
