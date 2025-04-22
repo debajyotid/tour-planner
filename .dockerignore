@@ -1,8 +1,44 @@
+# Version control
+.git
+.gitignore
+
+# Python cache and artifacts
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.so
+
+# Jupyter Notebook checkpoints
+jupyter_notebooks/.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment files
 .env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Streamlit secrets (never copy real secrets into Docker builds)
+streamlit_app/config/.streamlit/secrets.toml
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# OS files
 .DS_Store
-.env
-secrets.toml
+
+# Logs
+*.log
+
+# Docker files that shouldn't go into the image
+docker-compose.yml
