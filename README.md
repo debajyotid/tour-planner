@@ -49,7 +49,7 @@ It is perfect for travel agencies, individual travelers, or anyone looking to pl
    $ streamlit run streamlit_app.py
    
    ```
-### You can also access the app via the url: https://blank-app-2xug66lo1a8.streamlit.app
+#### You can also access the app via: https://debajyotidas88-aitourplanner.streamlit.app
    
 Modules and Functions:
 ----------------------
