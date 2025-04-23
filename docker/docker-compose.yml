@@ -1,0 +1,12 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8501:8501"
+    volumes:
+      # Mount your local secrets.toml into the container at the expected path
+      - ../streamlit_app/config/.streamlit/secrets.toml:/app/.streamlit/secrets.toml:ro
