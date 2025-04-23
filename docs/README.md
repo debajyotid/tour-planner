@@ -132,15 +132,14 @@ Libraries
 
 1. Clone the repository locally
 2. Rename the 'secrets.toml.template' file, under `/tour-planner/streamlit_app/config/.streamlit`,  to 'secrets.toml' and provide the relevant API keys 
-3.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
+3.	Build the Docker image and start services by executing either one of the below from yoyr terminal/command-prompt:
+   - `docker-compose -f docker/docker-compose.yml up --build` : If you are in the root folder (in this case \tour-planner)
+   - `docker-compose up --build`                              : If you are in the same directory as `docker-compose.yml` (in this case \tour-planner\docker)
 4.	Access the app at `http://localhost:8501`
 5.	To stop the container: Press `Ctrl+C` in the terminal, then run: `docker-compose -f docker/docker-compose.yml down`
 
 Required Environment Variables
 -------------------
-- `OPENAI_API_KEY`: Your OpenAI API key
-- `googlemaps_api_key`: Google Maps API key
-- `openweather_api_key`: OpenWeatherMap API key
-
-
-
+- `OPENAI_API_KEY`      : API Key for using OpenAI APIs for using the "gpt-3.5-turbo-0125" model
+- `googlemaps_api_key`  : API Key for using Google Map APIs for fetching tourist attractions, within a 5 km radius (parameterizable), around your trip destination
+- `openweather_api_key` : API Key for using OpenWeather APIs for fetching forecasted weather patterns around your trip destination
