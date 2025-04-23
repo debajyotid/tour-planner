@@ -181,7 +181,7 @@ def render_input_form():
             - budget (int): The budget entered by the user in pounds (£).
             - interests (list of str): A list of selected interests from the predefined options.
     """
-    """Renders the input form elements and returns their values."""
+
     st.markdown("### Enter Your Trip Details")
     with st.form(key='trip_input_form'):
         destination = st.text_input("Enter your destination:")
@@ -197,7 +197,6 @@ def render_input_form():
 # Function to validate user inputs
 def validate_user_inputs(destination, start_date, end_date, budget, interests, gmaps_client):
     """
-    Validates user inputs for a travel planning application.
 
     This function checks the validity of the provided destination, travel dates, budget, 
     and interests. It also attempts to geocode the destination using the provided Google 
@@ -217,7 +216,7 @@ def validate_user_inputs(destination, start_date, end_date, budget, interests, g
             - geocode_result (dict or None): The geocoding result for the destination 
               if it is valid, otherwise None.
     """
-    """Validates the user inputs and returns a list of errors and geocode result."""
+
     errors = []
     geocode_result = None
 
@@ -276,7 +275,7 @@ def handle_initial_generation(destination, start_date, end_date, budget, interes
         - If location data cannot be extracted from `geocode_result`, the function stops execution and displays an error.
         - Ensure that all required external services (e.g., Google Maps, OpenWeather) are properly configured.
     """
-    """Generates the initial itinerary, handles errors, and updates session state."""
+
     with st.spinner("Generating your trip plan..."):
         try:
             # Extract location data safely
@@ -335,9 +334,8 @@ def render_results_and_refinement():
         refinement request and updates the itinerary.
 
     Returns:
-            None
+        None
     """
-    """Displays the generated itinerary and the refinement section."""
     if not st.session_state.get('itinerary_generated', False):
         return
 
