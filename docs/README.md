@@ -130,13 +130,14 @@ Libraries
 
 ### Lastly, the 3rd way is through Docker
 
-1.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
-2.	Access the app at `http://localhost:8501`
-3.	To stop the containers: Press `Ctrl+C` in the terminal, then run: `docker-compose -f docker/docker-compose.yml down`
+1. Clone the repository locally
+2. Rename the 'secrets.toml.template' file, under `/tour-planner/streamlit_app/config/.streamlit`,  to 'secrets.toml' and provide the relevant API keys 
+3.	Build the Docker image and start services: `docker-compose -f docker/docker-compose.yml up --build`
+4.	Access the app at `http://localhost:8501`
+5.	To stop the container: Press `Ctrl+C` in the terminal, then run: `docker-compose -f docker/docker-compose.yml down`
 
 Required Environment Variables
 -------------------
-Replace these in your `.env` file:
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `googlemaps_api_key`: Google Maps API key
 - `openweather_api_key`: OpenWeatherMap API key
