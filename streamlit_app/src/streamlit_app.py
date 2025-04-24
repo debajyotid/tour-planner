@@ -365,13 +365,11 @@ def render_results_and_refinement():
                 # Handle exit case
                 st.session_state.itinerary_generated = False  # Reset flag to allow new itinerary generation
                 st.session_state.current_itinerary = ""  # Clear the current itinerary
-                st.session_state.refine_input = ""  # Clear the refinement input
                 # Display a message to the user indicating the app is exiting
                 st.write("Exiting the app. Thank you for using the AI Trip Planner!")
                 st.stop()  # Stop the app if user wants to exit
             else:
                 # Update the session state with the user's refinement request
-                st.session_state.refine_input = user_input_refine
                 # Optionally, display the user's input for confirmation
                 st.write(f"Refining your plan based on: {user_input_refine}")
                 # Call the refinement function (which uses session state)
