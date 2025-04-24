@@ -343,44 +343,46 @@ def render_results_and_refinement():
     # Display the current itinerary safely using .get
     st.write(st.session_state.get('current_itinerary', "No itinerary generated yet."))
 
-    st.markdown("---") # Separator
-    st.markdown("### Refine Your Plan")
-    # Flag to track if it's the first iteration
-    if 'is_first_iteration' not in st.session_state:
-        st.session_state.is_first_iteration = True
+    while True:
+        st.markdown("---")  # Separator
+        st.markdown("### Refine Your Plan")
 
-    # Update the message based on whether it's the first iteration
-    if st.session_state.is_first_iteration:
-        input_message = "Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:"
-    else:
-        input_message = "Do you want some more changes? If No, enter 'Exit' to quit:"
+        # Update the message based on whether it's the first iteration
+        if 'is_first_iteration' not in st.session_state:
+            st.session_state.is_first_iteration = True
 
-    # Use a unique key for the text input to avoid conflicts
-    user_input_refine = st.text_input(input_message, key="refine_input")
-
-    # Use the button click as the trigger
-    if st.button("Refine Plan", key="refine_button"):
-        if user_input_refine:  # Check if there is input before refining
-            if user_input_refine.lower() == 'exit':
-                # Handle exit case
-                st.session_state.itinerary_generated = False  # Reset flag to allow new itinerary generation
-                st.session_state.current_itinerary = ""  # Clear the current itinerary
-                # Display a message to the user indicating the app is exiting
-                st.write("Exiting the app. Thank you for using the AI Trip Planner!")
-                st.stop()  # Stop the app if user wants to exit
-            else:
-                # Update the session state with the user's refinement request
-                # Optionally, display the user's input for confirmation
-                st.write(f"Refining your plan based on: {user_input_refine}")
-                # Call the refinement function (which uses session state)
-                try:
-                    generate_refined_plan(user_input_refine)
-                    # Update the flag to indicate it's no longer the first iteration
-                    st.session_state.is_first_iteration = False
-                except Exception as e:
-                    st.error(f"An error occurred while refining the plan: {e}")
+        if st.session_state.is_first_iteration:
+            input_message = "Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:"
         else:
+            input_message = "Do you want some more changes? If No, enter 'Exit' to quit:"
+
+        # Use a unique key for the text input to avoid conflicts
+        user_input_refine = st.text_input(input_message, key="refine_input")
+
+        if not st.button("Refine Plan", key="refine_button"):
+            break  # Exit the loop if the button is not clicked
+        if not user_input_refine:  # Check if there is no input before refining
             st.warning("Please enter your requested changes before refining.")
+            return  # Exit early if no valid input is provided
+
+        if user_input_refine.lower() == 'exit':
+            # Handle exit case
+            st.session_state.itinerary_generated = False  # Reset flag to allow new itinerary generation
+            st.session_state.current_itinerary = ""  # Clear the current itinerary
+            # Display a message to the user indicating the app is exiting
+            st.write("Exiting the app. Thank you for using the AI Trip Planner!")
+            st.stop()  # Stop the app if user wants to exit
+
+        # Update the session state with the user's refinement request
+        # Optionally, display the user's input for confirmation
+        st.write(f"Refining your plan based on: {user_input_refine}")
+        # Call the refinement function (which uses session state)
+        try:
+            generate_refined_plan(user_input_refine)
+            # Update the flag to indicate it's no longer the first iteration
+            st.session_state.is_first_iteration = False
+        except Exception as e:
+            st.error(f"An error occurred while refining the plan: {e}")
 
 # ----------------------------------------main()--------------------------------------------------------------------------------------------------------------
 # Main function to run the Streamlit app
