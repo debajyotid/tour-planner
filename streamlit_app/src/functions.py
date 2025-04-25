@@ -1,6 +1,35 @@
 
+# Import necessary libraries
+import streamlit as st
 import googlemaps
 import requests
+
+# ----------------------------------------render_input_form()--------------------------------------------------------------------------------------------------------------
+# Function to render the input form for trip details
+def render_input_form():
+    """
+    Renders an input form for trip details using Streamlit and returns the user inputs.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - submitted (bool): Indicates whether the form was submitted.
+            - destination (str): The destination entered by the user.
+            - start_date (datetime.date): The start date of the trip.
+            - end_date (datetime.date): The end date of the trip.
+            - budget (int): The budget entered by the user in pounds (£).
+            - interests (list of str): A list of selected interests from the predefined options.
+    """
+
+    st.markdown("### Enter Your Trip Details")
+    with st.form(key='trip_input_form'):
+        destination = st.text_input("Enter your destination:")
+        start_date = st.date_input("Start Date")
+        end_date = st.date_input("End Date")
+        budget = st.number_input("Enter your budget (£):", min_value=1) # Min value 1
+        interests = st.multiselect("Select your interests:",
+                                   ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
+        submitted = st.form_submit_button("Generate Plan")
+    return submitted, destination, start_date, end_date, budget, interests
 
 # Check if the destination is a valid city
 # Validate the destination using a placeholder function
