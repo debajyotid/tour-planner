@@ -348,23 +348,18 @@ def render_results_and_refinement():
         # Update the message based on whether it's the first iteration
         if 'is_first_iteration' not in st.session_state:
             st.session_state.is_first_iteration = True
-            refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
+            st.session_state.refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
 
         if st.session_state.is_first_iteration:
             # Text input for user refinement requests. Use a unique key for the text input to avoid conflicts
-            user_input_refine = st.text_input("Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:", key="refine_input_1")
-
-            if not st.button("Refine Plan", key="refine_button_1"):
-                break  # Exit the loop if the button is not clicked
+            user_input_refine = st.text_input("Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:", key=f"refine_input_{st.session_state.refinmnt_rqst_cnt}" )
         else:
-            refinmnt_rqst_cnt += 1
-            unique_input_key = f"refine_input_{refinmnt_rqst_cnt}"          # Generate a unique key for each iteration
-            unique_input_button_key = f"refine_button_{refinmnt_rqst_cnt}"  # Unique key for the button
-
+            st.session_state.refinmnt_rqst_cnt += 1 # Increment the counter for each subsequent iteration
             # Text input for further user refinement requests. Using the unique key to avoid conflicts
-            user_input_refine = st.text_input("Do you want some more changes? If No, enter 'Exit' to quit:", key=unique_input_key)
-            if not st.button("Refine Plan", key=unique_input_button_key):
-                break  # Exit the loop if the button is not clicked
+            user_input_refine = st.text_input("Do you want some more changes? If No, enter 'Exit' to quit:", key=f"refine_input_{st.session_state.refinmnt_rqst_cnt}")
+        
+        if not st.button("Refine Plan", key=f"refine_button_{st.session_state.refinmnt_rqst_cnt}"):
+            break  # Exit the loop if the button is not clicked
 
         if not user_input_refine:  # Check if there is no input before refining
             st.warning("Please enter your requested changes before refining.")
