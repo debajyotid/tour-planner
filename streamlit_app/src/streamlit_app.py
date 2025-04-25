@@ -37,7 +37,6 @@ Modules and Functions:
 - `history`: Stores the conversation history between the user and the AI.
 - `itinerary_generated`: Boolean flag indicating whether an itinerary has been generated.
 - `current_itinerary`: Stores the latest generated or refined itinerary.
-- `refine_input`: Stores the user's refinement request.
 Error Handling:
 ---------------
 - Missing API keys or secrets are handled gracefully with error messages.
@@ -126,10 +125,8 @@ def generate_refined_plan(user_input):
         5. Updates the current itinerary in the session state.
         6. Displays the refined itinerary to the user.
     Notes:
-        - Ensure that `refine_chain` is properly initialized and compatible with 
-          the expected input/output format.
-        - The session state must have `history` and `current_itinerary` keys 
-          initialized before calling this function.
+        - Ensure that `refine_chain` is properly initialized and compatible with the expected input/output format.
+        - The session state must have `history` and `current_itinerary` keys initialized before calling this function.
         - Optional: Uncomment the section to display the full conversation history.
     Raises:
         KeyError: If required keys are missing in the session state.
@@ -162,8 +159,7 @@ def generate_refined_plan(user_input):
 
         # Optional: Display full conversation history
         # st.markdown("### Full Conversation History")
-        # full_conversation = "\n\n".join([f"User: {msg.content}" if msg.type == 'human' else f"AI: {msg.content}"
-        #                                  for msg in st.session_state.history.messages])
+        # full_conversation = "\n\n".join([f"User: {msg.content}" if msg.type == 'human' else f"AI: {msg.content}" for msg in st.session_state.history.messages])
         # st.text_area("Conversation History", full_conversation, height=300, key="conversation_history_display")        
 
 # ----------------------------------------render_input_form()--------------------------------------------------------------------------------------------------------------
@@ -286,18 +282,19 @@ def handle_initial_generation(destination, start_date, end_date, budget, interes
 
             location = geocode_result[0]['geometry']['location']
 
-            itinerary = generate_itinerary(destination,
-                                           start_date,
-                                           end_date,
-                                           budget,
-                                           interests,
-                                           location,
-                                           client,
-                                           gmaps_client,
-                                           openweather_key)
+            itinerary, user_input = generate_itinerary(destination,
+                                                       start_date,
+                                                       end_date,
+                                                       budget,
+                                                       interests,
+                                                       location,
+                                                       client,
+                                                       gmaps_client,
+                                                       openweather_key)
 
             # --- Update Session State ---
             st.session_state.history = ChatMessageHistory() # Reset history for a new plan
+            st.session_state.history.add_user_message(user_input)
             st.session_state.history.add_ai_message(itinerary)
             st.session_state.itinerary_generated = True
             st.session_state.current_itinerary = itinerary
@@ -327,7 +324,6 @@ def render_results_and_refinement():
     Session State Keys:
     - `itinerary_generated` (bool): Indicates whether an itinerary has been generated.
     - `current_itinerary` (str): Stores the current itinerary to be displayed.
-    - `refine_input` (str): Stores the user's refinement request.
 
     Dependencies:
     - `generate_refined_plan(user_input_refine)`: A function that processes the user's 
@@ -356,8 +352,8 @@ def render_results_and_refinement():
         else:
             input_message = "Do you want some more changes? If No, enter 'Exit' to quit:"
 
-        # Use a unique key for the text input to avoid conflicts
-        user_input_refine = st.text_input(input_message, key="refine_input")
+        # Text input for user refinement requests
+        user_input_refine = st.text_input(input_message)
 
         if not st.button("Refine Plan", key="refine_button"):
             break  # Exit the loop if the button is not clicked
