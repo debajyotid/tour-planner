@@ -37,6 +37,7 @@ Modules and Functions:
 - `history`: Stores the conversation history between the user and the AI.
 - `itinerary_generated`: Boolean flag indicating whether an itinerary has been generated.
 - `current_itinerary`: Stores the latest generated or refined itinerary.
+- `refine_input`: Stores the user's refinement request.
 Error Handling:
 ---------------
 - Missing API keys or secrets are handled gracefully with error messages.
@@ -324,6 +325,7 @@ def render_results_and_refinement():
     Session State Keys:
     - `itinerary_generated` (bool): Indicates whether an itinerary has been generated.
     - `current_itinerary` (str): Stores the current itinerary to be displayed.
+    - `refine_input` (str): Stores the user's refinement request.
 
     Dependencies:
     - `generate_refined_plan(user_input_refine)`: A function that processes the user's 
@@ -348,12 +350,14 @@ def render_results_and_refinement():
             st.session_state.is_first_iteration = True
 
         if st.session_state.is_first_iteration:
-            input_message = "Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:"
+            # Text input for user refinement requests. Use a unique key for the text input to avoid conflicts
+            user_input_refine = st.text_input("Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:", key="refine_input_1")
+            refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
         else:
-            input_message = "Do you want some more changes? If No, enter 'Exit' to quit:"
-
-        # Text input for user refinement requests
-        user_input_refine = st.text_input(input_message)
+            refinmnt_rqst_cnt += 1
+            unique_key = f"refine_input_{refinmnt_rqst_cnt}" # Generate a unique key for each iteration
+            # Text input for further user refinement requests. Using the unique key to avoid conflicts
+            user_input_refine = st.text_input("Do you want some more changes? If No, enter 'Exit' to quit:", key=unique_key)
 
         if not st.button("Refine Plan", key="refine_button"):
             break  # Exit the loop if the button is not clicked
