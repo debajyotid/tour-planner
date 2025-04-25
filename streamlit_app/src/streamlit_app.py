@@ -348,6 +348,7 @@ def render_results_and_refinement():
         # Update the message based on whether it's the first iteration
         if 'is_first_iteration' not in st.session_state:
             st.session_state.is_first_iteration = True
+            refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
 
         if st.session_state.is_first_iteration:
             # Text input for user refinement requests. Use a unique key for the text input to avoid conflicts
@@ -355,7 +356,6 @@ def render_results_and_refinement():
 
             if not st.button("Refine Plan", key="refine_button_1"):
                 break  # Exit the loop if the button is not clicked
-            refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
         else:
             refinmnt_rqst_cnt += 1
             unique_input_key = f"refine_input_{refinmnt_rqst_cnt}"          # Generate a unique key for each iteration
