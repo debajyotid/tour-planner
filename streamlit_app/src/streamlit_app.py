@@ -345,10 +345,13 @@ def render_results_and_refinement():
         st.markdown("---")  # Separator
         st.markdown("### Refine Your Plan")
 
+        # Initialize the counter for refinement requests.
+        if 'refinmnt_rqst_cnt' not in st.session_state:
+            st.session_state.refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
+
         # Update the message based on whether it's the first iteration
         if 'is_first_iteration' not in st.session_state:
             st.session_state.is_first_iteration = True
-            st.session_state.refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
 
         if st.session_state.is_first_iteration:
             # Text input for user refinement requests. Use a unique key for the text input to avoid conflicts
