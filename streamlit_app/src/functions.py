@@ -25,9 +25,8 @@ def render_input_form():
         destination = st.text_input("Enter your destination:")
         start_date = st.date_input("Start Date")
         end_date = st.date_input("End Date")
-        budget = st.number_input("Enter your budget (£):", min_value=1) # Min value 1
-        interests = st.multiselect("Select your interests:",
-                                   ["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
+        budget = st.number_input("Enter your budget in pounds(£):", min_value=100, step=50, format="%d") # Min value £100
+        interests = st.multiselect("Select your interests:",["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
         submitted = st.form_submit_button("Generate Plan")
     return submitted, destination, start_date, end_date, budget, interests
 
