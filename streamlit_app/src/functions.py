@@ -75,7 +75,7 @@ def get_attractions(destination, gmapsclient):
     lat_lng = (destination['lat'], destination['lng'])
 
     # Using the "places_nearby" API to get tourist attractions, within a 5000m radius, of the latitude-longitude of the chosen destination
-    places_result = gmapsclient.places_nearby(location=lat_lng, radius=5000, type='tourist_attraction')
+    places_result = gmapsclient.places_nearby(location=lat_lng, radius=5000, type='tourist_attraction', rank_by='prominence', language='en')
     return [place['name'] for place in places_result['results']]
 
 def get_weather(destination,api_key):
@@ -142,6 +142,9 @@ def generate_itinerary(destination, start_date, end_date, budget, interests, loc
     Please also include places like, {tourist_attraction}, in the itinerary and
     factor the forecasted weather, like {weather_forecast} while building the itinerary.
     """
+    # Added budget anchoring in the prompt template to ensure the model adheres to the budget constraint.
+    prompt += f"STRICT RULE: Total cost MUST NOT exceed £{budget}. Prioritize free/cheap options first."  
+
     response = openaiclient.chat.completions.create(model="gpt-3.5-turbo-0125",
                                                     messages=[
                                                                 {
