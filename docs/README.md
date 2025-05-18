@@ -132,7 +132,7 @@ Libraries
 
 1. Clone the repository locally
 2. Rename the 'secrets.toml.template' file, under `/tour-planner/streamlit_app/config/.streamlit`,  to 'secrets.toml' and provide the relevant API keys 
-3.	Build the Docker image and start services by executing either one of the below from yoyr terminal/command-prompt:
+3.	Build the Docker image and start services by executing either one of the below from your terminal/command-prompt:
    - `docker-compose -f docker/docker-compose.yml up --build` : If you are in the root folder (in this case \tour-planner)
    - `docker-compose up --build`                              : If you are in the same directory as `docker-compose.yml` (in this case \tour-planner\docker)
 4.	Access the app at `http://localhost:8501`
