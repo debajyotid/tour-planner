@@ -23,12 +23,13 @@ def render_input_form():
     st.markdown("### Enter Your Trip Details")
     with st.form(key='trip_input_form'):
         destination = st.text_input("Enter your destination:")
+        no_of_people = st.number_input("Number of people:", min_value=1, step=1, format="%d") # Min value 1 person
         start_date = st.date_input("Start Date")
         end_date = st.date_input("End Date")
         budget = st.number_input("Enter your budget in pounds(£):", min_value=100, step=50, format="%d") # Min value £100
         interests = st.multiselect("Select your interests:",["Nature", "History", "Food", "Adventure", "Shopping", "Relaxation"])
         submitted = st.form_submit_button("Generate Plan")
-    return submitted, destination, start_date, end_date, budget, interests
+    return submitted, destination, no_of_people, start_date, end_date, budget, interests
 
 # Check if the destination is a valid city
 # Validate the destination using a placeholder function
@@ -101,11 +102,12 @@ def get_weather(destination,api_key):
     else:
         return "Weather data not available."
 
-def generate_itinerary(destination, start_date, end_date, budget, interests, location, openaiclient, gmapsclient, openweather_api_key):
+def generate_itinerary(destination, no_of_people, start_date, end_date, budget, interests, location, openaiclient, gmapsclient, openweather_api_key):
     """Generates a day-by-day travel itinerary for a specified destination, date range, budget, and interests.
 
     Args:
         destination (str): The name of the destination for the trip.
+        no_of_people (int): The number of people traveling.
         start_date (str): The start date of the trip in YYYY-MM-DD format.
         end_date (str): The end date of the trip in YYYY-MM-DD format.
         budget (float): The budget for the trip in GBP (£).
@@ -134,12 +136,13 @@ def generate_itinerary(destination, start_date, end_date, budget, interests, loc
 
     prompt = f"""
     You are a helpful tour planner.
-    Please create a day-by-day itinerary, within 1000 words or less,
+    Create a day-by-day itinerary, within 1000 words or less,
     for a trip to {destination},
+    for {no_of_people} people,
     from {start_date} to {end_date},
     within a budget of £{budget}, and 
     with focus on the below interests {', '.join(interests)}.
-    Please also include places like, {tourist_attraction}, in the itinerary and
+    Include places like, {tourist_attraction}, in the itinerary and
     factor the forecasted weather, like {weather_forecast} while building the itinerary.
     """
     # Added budget anchoring in the prompt template to ensure the model adheres to the budget constraint.
