@@ -215,7 +215,7 @@ def validate_user_inputs(destination, start_date, end_date, budget, interests, g
 
 # ----------------------------------------handle_initial_generation()--------------------------------------------------------------------------------------------------------------
 # Function to handle the initial itinerary generation
-def handle_initial_generation(destination, no_of_people, start_date, end_date, budget, interests, geocode_result, client, gmaps_client, openweather_key):
+def handle_initial_generation(destination, no_of_adults, no_of_children, start_date, end_date, budget, interests, geocode_result, client, gmaps_client, openweather_key):
     """
     Generates the initial itinerary for a trip, handles potential errors, and updates the session state.
 
@@ -224,7 +224,8 @@ def handle_initial_generation(destination, no_of_people, start_date, end_date, b
 
     Args:
         destination (str): The destination for the trip.
-        no_of_people (int): The number of people traveling.
+        no_of_adults (int): The number of adults traveling.
+        no_of_children (int): The number of children traveling.
         start_date (str): The start date of the trip in 'YYYY-MM-DD' format.
         end_date (str): The end date of the trip in 'YYYY-MM-DD' format.
         budget (float): The budget for the trip.
@@ -258,7 +259,8 @@ def handle_initial_generation(destination, no_of_people, start_date, end_date, b
             location = geocode_result[0]['geometry']['location']
 
             itinerary, user_input = generate_itinerary(destination,
-                                                       no_of_people,
+                                                       no_of_adults, 
+                                                       no_of_children,
                                                        start_date,
                                                        end_date,
                                                        budget,
@@ -404,7 +406,7 @@ def main():
 
     # --- Input Form ---
     # Uses globally initialized gmaps, client, openweather_api_key   
-    submitted, destination, no_of_people, start_date, end_date, budget, interests = render_input_form()
+    submitted, destination, no_of_adults, no_of_children, start_date, end_date, budget, interests = render_input_form()
 
     # --- Handle Form Submission ---
     if submitted:
@@ -422,7 +424,8 @@ def main():
             # --- Generate Initial Itinerary ---
             # Pass the globally initialized clients and keys
             handle_initial_generation(destination,
-                                      no_of_people,
+                                      no_of_adults, 
+                                      no_of_children,
                                       start_date,
                                       end_date,
                                       budget,
