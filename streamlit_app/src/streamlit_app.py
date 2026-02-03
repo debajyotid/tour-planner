@@ -76,13 +76,13 @@ try:
     # --- Initialize Session State ---
     # Use session state to store history and generation status (runs only once per session)
     if 'history' not in st.session_state:
-        st.session_state.history = ChatMessageHistory()
-    if 'itinerary_generated' not in st.session_state:
-        st.session_state.itinerary_generated = False
+       st.session_state.history = ChatMessageHistory()
+   if 'itinerary_generated' not in st.session_state:
+       st.session_state.itinerary_generated = False
     if 'current_itinerary' not in st.session_state:
-        st.session_state.current_itinerary = "" # Store the latest itinerary text
-    if 'available_hotels' not in st.session_state:
-        st.session_state.available_hotels = []
+       st.session_state.current_itinerary = "" # Store the latest itinerary text
+   if 'available_hotels' not in st.session_state:
+       st.session_state.available_hotels = []
     if 'budget_breakdown' not in st.session_state:
         st.session_state.budget_breakdown = None
     if 'trip_duration' not in st.session_state:
@@ -91,13 +91,13 @@ try:
         st.session_state.show_hotels = False
 
     # --- LLM and Prompt Setup ---
-    # Using OpenAI "gpt-3.5-turbo-0125" model
-    try:
-        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0, api_key=OPENAI_API_KEY)
+   # Using OpenAI "gpt-3.5-turbo-0125" model
+   try:
+       llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0, api_key=OPENAI_API_KEY)
         client = OpenAI(api_key=OPENAI_API_KEY) # OpenAI client for other potential uses
-        gmaps = googlemaps.Client(key=googlemaps_api_key) # Google Maps client
-    except Exception as e:
-        st.error(f"Error initializing API clients: {e}")
+       gmaps = googlemaps.Client(key=googlemaps_api_key) # Google Maps client
+   except Exception as e:
+       st.error(f"Error initializing API clients: {e}")
         st.stop() # Stop execution if clients fail to initialize
 
     # Generating a new prompt template to handle conversation history
@@ -170,11 +170,73 @@ def generate_refined_plan(user_input):
         # st.markdown("### Full Conversation History")
         # full_conversation = "\n\n".join([f"User: {msg.content}" if msg.type == 'human' else f"AI: {msg.content}" for msg in st.session_state.history.messages])
         # st.text_area("Conversation History", full_conversation, height=300, key="conversation_history_display")        
+   # Create the chain (do this once)
+   refine_chain = LLMChain(llm=llm, prompt=conversation_prompt)
+except KeyError as e:
+    st.error(f"CRITICAL ERROR: Missing secret: {e}. Please configure secrets in Streamlit.")
+    st.stop() # Stop execution if secrets are missing during initial load
+except Exception as e:
+    st.error(f"CRITICAL ERROR during initialization: {e}")
+    st.stop() # Stop execution on other critical init errors   
+
+#-----------------------------------------generate_refined_plan()--------------------------------------------------------------------------------------------------------------
+# Function to generate a refined trip plan based on user input
+def generate_refined_plan(user_input):
+    """
+    Generates a refined trip plan based on user input and conversation history.
+    This function interacts with an AI model or API to refine a trip itinerary. 
+    It uses the session state to maintain conversation history and updates the 
+    current itinerary. The refined itinerary is displayed to the user.
+    Args:
+        user_input (str): The user's input or request for refining the trip plan.
+    Workflow:
+        1. Retrieves the conversation history from the session state.
+        2. Invokes the refinement chain with the history and user input.
+        3. Extracts the refined itinerary from the chain's response.
+        4. Updates the session state with the user's input and AI's response.
+        5. Updates the current itinerary in the session state.
+        6. Displays the refined itinerary to the user.
+    Notes:
+        - Ensure that `refine_chain` is properly initialized and compatible with the expected input/output format.
+        - The session state must have `history` and `current_itinerary` keys initialized before calling this function.
+        - Optional: Uncomment the section to display the full conversation history.
+    Raises:
+        KeyError: If required keys are missing in the session state.
+        Exception: If the refinement chain invocation fails or returns an unexpected response.
+    """
+    # Call the AI model and APIs here
+    with st.spinner("Generating your refined trip plan..."):
+
+        # Use history from session state
+        history_langchain_format = st.session_state.history.messages
+
+        # Get refined reply using the chain
+        # Note: Ensure get_refined_reply is adapted if needed, or use the chain directly
+        # refined_itinerary = get_refined_reply(refine_chain, user_input, history_langchain_format) # If get_refined_reply is a wrapper
+        # Or directly invoke the chain:
+        response = refine_chain.invoke({"history": history_langchain_format,"input": user_input})
+        
+        refined_itinerary = response['text'] # Adjust based on actual chain output key
+
+        # Add user input and AI response to session state history
+        st.session_state.history.add_user_message(user_input)
+        st.session_state.history.add_ai_message(refined_itinerary)
+
+        # Update the current itinerary in session state
+        st.session_state.current_itinerary = refined_itinerary
+
+        # Display the latest refined itinerary (optional: display full history too)
+        st.markdown("## Refined Itinerary")
+        st.write(st.session_state.current_itinerary)
+
+        # Optional: Display full conversation history
+        # st.markdown("## Full Conversation History")
+        # full_conversation = "\n\n".join([f"User: {msg.content}" if msg.type == 'human' else f"AI: {msg.content}" for msg in st.session_state.history.messages])
+        # st.text_area("Conversation History", full_conversation, height=300, key="conversation_history_display")        
 
 # ----------------------------------------validate_user_inputs()--------------------------------------------------------------------------------------------------------------
 # Function to validate user inputs
 def validate_user_inputs(destination, start_date, end_date, budget, interests, gmaps_client):
-    """
 
     This function checks the validity of the provided destination, travel dates, budget, 
     and interests. It also attempts to geocode the destination using the provided Google 
@@ -198,13 +260,13 @@ def validate_user_inputs(destination, start_date, end_date, budget, interests, g
     errors = []
     geocode_result = None
 
-    if not destination:
-        errors.append("Please enter a destination.")
-    if not start_date or not end_date:
+   if not destination:
+       errors.append("Please enter a destination.")
+   if not start_date or not end_date:
         errors.append("Please select start and end dates.")
-    elif start_date > end_date:
-        errors.append("Start date must be before end date.")
-    if budget <= 0:
+   elif start_date > end_date:
+       errors.append("Start date must be before end date.")
+   if budget <= 0:
         errors.append("Budget must be greater than zero.")
     if not interests:
         errors.append("Please select at least one interest.")
@@ -346,59 +408,69 @@ def render_results_and_refinement():
     """
     if not st.session_state.get('itinerary_generated', False):
         return
+    """
+    Displays the generated itinerary and provides a section for users to refine the plan.
 
-    st.markdown("### Your AI-generated itinerary")
-    # Display the current itinerary safely using .get
-    st.write(st.session_state.get('current_itinerary', "No itinerary generated yet."))
+    This function checks if an itinerary has been generated by verifying the 
+    `itinerary_generated` flag in the session state. If the flag is set, it displays 
+    the current itinerary and provides a text input field for users to request changes 
+    to the plan. Users can submit their refinement requests using a button, which 
+    triggers the refinement process.
 
-    if st.session_state.get("available_hotels"):
-        st.markdown("### Available Hotels Within Budget")
-        budget_breakdown = st.session_state.get("budget_breakdown") or {}
-        trip_duration = st.session_state.get("trip_duration") or 1
-        if budget_breakdown:
-            st.caption(
-                "Estimated budget split — "
-                f"Lodging: £{budget_breakdown.get('lodging_budget', 0):.0f}, "
-                f"Food: £{budget_breakdown.get('food', 0):.0f}, "
-                f"Local travel: £{budget_breakdown.get('local_travel', 0):.0f}, "
-                f"Tickets: £{budget_breakdown.get('tickets', 0):.0f}."
-            )
-        for hotel in st.session_state.available_hotels[:10]:
-            nightly = hotel.get("estimated_nightly_rate")
-            total_stay = hotel.get("estimated_total_stay_cost")
-            st.write(
-                f"**{hotel.get('name','Hotel')}** — Rating: {hotel.get('rating','N/A')} "
-                f"({hotel.get('user_ratings_total', 0)} reviews), "
-                f"Est. £{nightly}/night, Est. total £{total_stay:.0f} for {trip_duration} nights. "
-                f"Location: {hotel.get('vicinity','N/A')}"
-            )
-    elif st.session_state.get("show_hotels"):
-        st.markdown("### Available Hotels Within Budget")
-        st.info("No hotels matched the budget and rating filters for your dates. Try lowering the rating or increasing the budget.")
+    Key Features:
+    - Displays the AI-generated itinerary stored in the session state.
+    - Provides a text input field for users to specify changes to the itinerary.
+    - Includes a button to trigger the refinement process.
+    - Validates user input and displays a warning if no input is provided.
 
-    while True:
-        st.markdown("---")  # Separator
-        st.markdown("### Refine Your Plan")
+    Session State Keys:
+    - `itinerary_generated` (bool): Indicates whether an itinerary has been generated.
+    - `current_itinerary` (str): Stores the current itinerary to be displayed.
+    - `refine_input` (str): Stores the user's refinement request.
 
-        # Initialize the counter for refinement requests.
-        if 'refinmnt_rqst_cnt' not in st.session_state:
-            st.session_state.refinmnt_rqst_cnt = 1 # Initialize the counter for refinement requests
+    Dependencies:
+    - `generate_refined_plan(user_input_refine)`: A function that processes the user's 
+        refinement request and updates the itinerary.
 
-        # Update the message based on whether it's the first iteration
-        if 'is_first_iteration' not in st.session_state:
-            st.session_state.is_first_iteration = True
+    Returns:
+        None
+    """
+   if not st.session_state.get('itinerary_generated', False):
+       return
+   st.markdown("## Your AI-generated itinerary")
+   # Display the current itinerary safely using .get
+   st.write(st.session_state.get('current_itinerary', "No itinerary generated yet."))
+   if st.session_state.get("available_hotels"):
+       st.markdown("## Available Hotels Within Budget")
+       budget_breakdown = st.session_state.get("budget_breakdown") or {}
+       trip_duration = st.session_state.get("trip_duration") or 1
+       if budget_breakdown:
+           st.caption(
+               "Estimated budget split — "
+               f"Lodging: £{budget_breakdown.get('lodging_budget', 0):.0f}, "
+               f"Food: £{budget_breakdown.get('food', 0):.0f}, "
+               f"Local travel: £{budget_breakdown.get('local_travel', 0):.0f}, "
+               f"Tickets: £{budget_breakdown.get('tickets', 0):.0f}."
+           )
+       for hotel in st.session_state.available_hotels[:10]:
+           nightly = hotel.get("estimated_nightly_rate")
+           total_stay = hotel.get("estimated_total_stay_cost")
+           st.write(
+               f"**{hotel.get('name','Hotel')}** — Rating: {hotel.get('rating','N/A')} "
+               f"({hotel.get('user_ratings_total', 0)} reviews), "
+               f"Est. £{nightly}/night, Est. total £{total_stay:.0f} for {trip_duration} nights. "
+               f"Location: {hotel.get('vicinity','N/A')}"
+           )
+   elif st.session_state.get("show_hotels"):
+       st.markdown("## Available Hotels Within Budget")
+       st.info("No hotels matched the budget and rating filters for your dates. Try lowering the rating or increasing the budget.")
+    st.markdown("---")  # Separator
+    st.markdown("## Refine Your Plan")
 
-        if st.session_state.is_first_iteration:
-            # Text input for user refinement requests. Use a unique key for the text input to avoid conflicts
-            user_input_refine = st.text_input("Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:", key=f"refine_input_{st.session_state.refinmnt_rqst_cnt}" )
-        else:
-            st.session_state.refinmnt_rqst_cnt += 1 # Increment the counter for each subsequent iteration
-            # Text input for further user refinement requests. Using the unique key to avoid conflicts
-            user_input_refine = st.text_input("Do you want some more changes? If No, enter 'Exit' to quit:", key=f"refine_input_{st.session_state.refinmnt_rqst_cnt}")
-        
-        if not st.button("Refine Plan", key=f"refine_button_{st.session_state.refinmnt_rqst_cnt}"):
-            break  # Exit the loop if the button is not clicked
-
+    # Text input for user refinement requests
+    user_input_refine = st.text_input("Do you want some changes (e.g. 'Add more food experiences on Day 2')? If No, enter 'Exit' to quit:", key="refine_input")
+    
+    if st.button("Refine Plan"):
         if not user_input_refine:  # Check if there is no input before refining
             st.warning("Please enter your requested changes before refining.")
             return  # Exit early if no valid input is provided
@@ -417,11 +489,8 @@ def render_results_and_refinement():
         # Call the refinement function (which uses session state)
         try:
             generate_refined_plan(user_input_refine)
-            # Update the flag to indicate it's no longer the first iteration
-            st.session_state.is_first_iteration = False
         except Exception as e:
             st.error(f"An error occurred while refining the plan: {e}")
-
 # ----------------------------------------main()--------------------------------------------------------------------------------------------------------------
 # Main function to run the Streamlit app
 def main():
