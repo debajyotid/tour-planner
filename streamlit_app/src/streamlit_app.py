@@ -81,6 +81,14 @@ try:
         st.session_state.itinerary_generated = False
     if 'current_itinerary' not in st.session_state:
         st.session_state.current_itinerary = "" # Store the latest itinerary text
+    if 'available_hotels' not in st.session_state:
+        st.session_state.available_hotels = []
+    if 'budget_breakdown' not in st.session_state:
+        st.session_state.budget_breakdown = None
+    if 'trip_duration' not in st.session_state:
+        st.session_state.trip_duration = None
+    if 'show_hotels' not in st.session_state:
+        st.session_state.show_hotels = False
 
     # --- LLM and Prompt Setup ---
     # Using OpenAI "gpt-3.5-turbo-0125" model
@@ -215,7 +223,7 @@ def validate_user_inputs(destination, start_date, end_date, budget, interests, g
 
 # ----------------------------------------handle_initial_generation()--------------------------------------------------------------------------------------------------------------
 # Function to handle the initial itinerary generation
-def handle_initial_generation(destination, no_of_adults, no_of_children, start_date, end_date, budget, interests, geocode_result, client, gmaps_client, openweather_key):
+def handle_initial_generation(destination, no_of_adults, no_of_children, start_date, end_date, budget, interests, geocode_result, client, gmaps_client, openweather_key, accommodation_type, accommodation_rating, show_hotels):
     """
     Generates the initial itinerary for a trip, handles potential errors, and updates the session state.
 
@@ -258,6 +266,24 @@ def handle_initial_generation(destination, no_of_adults, no_of_children, start_d
 
             location = geocode_result[0]['geometry']['location']
 
+            # Calculate total number of travelers
+            total_travelers = no_of_adults + no_of_children
+            
+            available_hotels = []
+            budget_breakdown = None
+            trip_duration = None
+            if show_hotels:
+                available_hotels, budget_breakdown, trip_duration = get_available_hotels(
+                    location,
+                    start_date,
+                    end_date,
+                    budget,
+                    total_travelers,
+                    gmaps_client,
+                    accommodation_type,
+                    accommodation_rating,
+                )
+
             itinerary, user_input = generate_itinerary(destination,
                                                        no_of_adults, 
                                                        no_of_children,
@@ -268,7 +294,10 @@ def handle_initial_generation(destination, no_of_adults, no_of_children, start_d
                                                        location,
                                                        client,
                                                        gmaps_client,
-                                                       openweather_key)
+                                                       openweather_key,
+                                                       available_hotels=available_hotels,
+                                                       budget_breakdown=budget_breakdown,
+                                                       trip_duration=trip_duration)
 
             # --- Update Session State ---
             st.session_state.history = ChatMessageHistory() # Reset history for a new plan
@@ -276,6 +305,10 @@ def handle_initial_generation(destination, no_of_adults, no_of_children, start_d
             st.session_state.history.add_ai_message(itinerary)
             st.session_state.itinerary_generated = True
             st.session_state.current_itinerary = itinerary
+            st.session_state.available_hotels = available_hotels
+            st.session_state.budget_breakdown = budget_breakdown
+            st.session_state.trip_duration = trip_duration
+            st.session_state.show_hotels = show_hotels
 
         except Exception as e: # Consider more specific exceptions
             st.error(f"Error generating itinerary: {e}")
@@ -317,6 +350,31 @@ def render_results_and_refinement():
     st.markdown("### Your AI-generated itinerary")
     # Display the current itinerary safely using .get
     st.write(st.session_state.get('current_itinerary', "No itinerary generated yet."))
+
+    if st.session_state.get("available_hotels"):
+        st.markdown("### Available Hotels Within Budget")
+        budget_breakdown = st.session_state.get("budget_breakdown") or {}
+        trip_duration = st.session_state.get("trip_duration") or 1
+        if budget_breakdown:
+            st.caption(
+                "Estimated budget split — "
+                f"Lodging: £{budget_breakdown.get('lodging_budget', 0):.0f}, "
+                f"Food: £{budget_breakdown.get('food', 0):.0f}, "
+                f"Local travel: £{budget_breakdown.get('local_travel', 0):.0f}, "
+                f"Tickets: £{budget_breakdown.get('tickets', 0):.0f}."
+            )
+        for hotel in st.session_state.available_hotels[:10]:
+            nightly = hotel.get("estimated_nightly_rate")
+            total_stay = hotel.get("estimated_total_stay_cost")
+            st.write(
+                f"**{hotel.get('name','Hotel')}** — Rating: {hotel.get('rating','N/A')} "
+                f"({hotel.get('user_ratings_total', 0)} reviews), "
+                f"Est. £{nightly}/night, Est. total £{total_stay:.0f} for {trip_duration} nights. "
+                f"Location: {hotel.get('vicinity','N/A')}"
+            )
+    elif st.session_state.get("show_hotels"):
+        st.markdown("### Available Hotels Within Budget")
+        st.info("No hotels matched the budget and rating filters for your dates. Try lowering the rating or increasing the budget.")
 
     while True:
         st.markdown("---")  # Separator
@@ -406,7 +464,7 @@ def main():
 
     # --- Input Form ---
     # Uses globally initialized gmaps, client, openweather_api_key   
-    submitted, destination, no_of_adults, no_of_children, start_date, end_date, budget, interests = render_input_form()
+    submitted, destination, no_of_adults, no_of_children, start_date, end_date, budget, interests, accommodation_type, accommodation_rating, show_hotels = render_input_form()
 
     # --- Handle Form Submission ---
     if submitted:
@@ -433,7 +491,10 @@ def main():
                                       geocode_result,
                                       client, # Global OpenAI client
                                       gmaps,  # Global Google Maps client
-                                      openweather_api_key) # Global OpenWeather API key
+                                      openweather_api_key, # Global OpenWeather API key
+                                      accommodation_type,
+                                      accommodation_rating,
+                                      show_hotels)
 
     # --- Display Itinerary and Refinement Section ---
     # This part runs on every interaction if an itinerary exists
